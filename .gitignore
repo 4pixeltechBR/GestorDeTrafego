@@ -1,3 +1,42 @@
+# =============================================
+# 🔒 GESTOR DE TRÁFEGO IA — PROTEÇÃO DE DADOS
+# =============================================
+# NUNCA remova estas regras! Elas protegem suas
+# API Keys, tokens e dados pessoais de campanhas.
+
+# --- Dados Sensíveis do Projeto ---
+.env
+.env.local
+.env.production
+*.env.backup
+
+# --- Bancos de Dados Locais ---
+data/
+chroma_db/
+*.db
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+
+# --- Tokens e Credenciais ---
+token.json
+credentials.json
+*.pem
+*.key
+*.p12
+
+# --- Logs do Sistema ---
+logs/
+*.log
+
+# --- Backups ---
+backups/
+
+# =============================================
+# Python (Padrão GitHub)
+# =============================================
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

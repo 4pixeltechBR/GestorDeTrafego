@@ -1,0 +1,49 @@
+nicho: auto_center
+nome_display: "Auto Center / Oficina Mecânica"
+
+publico_alvo:
+  idade_min: 25
+  idade_max: 55
+  interesses:
+    - "Automóveis"
+    - "Manutenção de veículos"
+    - "Pneus"
+    - "Oficina mecânica"
+    - "Carros"
+  localizacao: "raio_km: 15"
+  genero: "todos"
+
+benchmarks:
+  cpc_medio: 1.80
+  ctr_medio: 1.2
+  cpc_maximo_aceitavel: 3.50
+  roas_minimo: 1.5
+  dias_aprendizado: 3
+  frequencia_maxima: 3.5
+
+copy_diretrizes:
+  tom: "direto, confiável, técnico mas acessível"
+  gatilhos:
+    - "garantia"
+    - "preço justo"
+    - "agendar agora"
+    - "sem surpresas"
+    - "diagnóstico gratuito"
+  proibido:
+    - "promessas de preço sem confirmar"
+    - "comparação com concorrentes por nome"
+    - "linguagem muito informal"
+  exemplos_titulo:
+    - "Troca de Óleo com Garantia — Agende Já"
+    - "Pneu Novo com Preço Justo — Só Hoje"
+    - "Revisão Completa: Diagnóstico Grátis"
+
+metricas_prioridade:
+  - "ROAS"
+  - "CPA"
+  - "CTR"
+  - "CPC"
+
+objetivo_padrao: "OUTCOME_TRAFFIC"
+
+cta_padrao: "BOOK_NOW"

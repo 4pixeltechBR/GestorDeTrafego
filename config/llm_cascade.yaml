@@ -1,0 +1,67 @@
+# Cascata de APIs por Agente
+# O sistema tenta o primeiro provedor; se falhar (429/timeout), pula para o próximo.
+# Configure suas API Keys no arquivo .env
+
+orchestrator:
+  name: "Orquestrador"
+  description: "Cérebro do sistema. Interpreta briefings e coordena agentes."
+  models:
+    - provider: groq
+      model: "qwen-qwq-32b"
+      max_tokens: 4096
+    - provider: groq
+      model: "llama-3.3-70b-versatile"
+      max_tokens: 4096
+    - provider: google
+      model: "gemini/gemini-2.5-flash-preview-04-17"
+      max_tokens: 4096
+
+copywriter:
+  name: "Copywriter"
+  description: "Gera textos persuasivos para anúncios."
+  models:
+    - provider: google
+      model: "gemini/gemini-2.5-flash-preview-04-17"
+      max_tokens: 2048
+    - provider: groq
+      model: "qwen-qwq-32b"
+      max_tokens: 2048
+    - provider: openrouter
+      model: "openrouter/meta-llama/llama-3.3-70b-instruct:free"
+      max_tokens: 2048
+
+compliance:
+  name: "Compliance"
+  description: "Valida copies contra políticas de anúncio do Meta."
+  models:
+    - provider: groq
+      model: "llama-3.3-70b-versatile"
+      max_tokens: 1024
+    - provider: google
+      model: "gemini/gemini-2.5-flash-lite-preview-06-17"
+      max_tokens: 1024
+
+executor:
+  name: "Executor"
+  description: "Monta JSONs validados para a Meta API."
+  models:
+    - provider: nvidia_nim
+      model: "nvidia_nim/qwen/qwen2.5-coder-32b-instruct"
+      max_tokens: 4096
+    - provider: groq
+      model: "qwen-qwq-32b"
+      max_tokens: 4096
+
+analyst:
+  name: "Analista"
+  description: "Analisa métricas de campanhas e sugere otimizações."
+  models:
+    - provider: google
+      model: "gemini/gemini-2.5-flash-preview-04-17"
+      max_tokens: 4096
+    - provider: groq
+      model: "qwen-qwq-32b"
+      max_tokens: 4096
+    - provider: groq
+      model: "llama-3.3-70b-versatile"
+      max_tokens: 4096
