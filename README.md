@@ -28,6 +28,32 @@ O **Gestor de Tráfego IA** foi concebido sob três pilares inegociáveis:
 
 ---
 
+## 🌪️ A Mágica do Custo-Zero (Sua Cascata de APIs)
+
+A grande sacada do Gestor de Tráfego IA é o **LLM Router**. 
+
+Provedores poderosos oferecem cotas gratuitas (Free Tier), mas com limites rigorosos (Ex: *15 requisições por minuto* ou *30K tokens por minuto*). Se você tenta processar uma campanha inteira em um só provedor grátis, você bate no teto (Erro 429) e seu script morre.
+
+**Como o Gestor resolve isso:**
+Ele roda uma "Cascata". O sistema aciona os agentes em uma fila de provedores pré-configurada no arquivo `config/llm_cascade.yaml`. Se a **Google (Gemini)** barrar você por cota estourada, o código intercepta a queda silenciosamente em 300ms e re-envia a mesma prompt, com o mesmo contexto, para a **Groq (Llama 3.3)**. 
+
+O usuário final só vê a interface trabalhando, sem interrupções e sem pagar $1 dólar à OpenAI ou Anthropic.
+
+### 🏆 Qual Modelo e Provedor Escolher?
+
+Para manter o ecossistema Custo-Zero e ao mesmo tempo ter raciocínio nível Sênior, nós recomendamos fortemente esta trindade (configure no seu `.env`):
+
+1. **Groq (`llama-3.3-70b-versatile`)**:
+   - **Por que usar:** É absurdamente rápido (800+ tokens por segundo) e a inteligência do Llama 3 70B é perfeitamente afiada para formatar JSONs e interpretar contextos.
+   - **Onde o sistema usa:** *Orquestrador* (raciocínio rápido) e *Executor* (geração pura de JSON com zero margem de formatação errada).
+2. **Google AI Studio (`gemini-2.0-flash`)**:
+   - **Por que usar:** O Free Tier do Google tem uma janela de contexto colossal e ele é absurdamente criativo.
+   - **Onde o sistema usa:** *Copywriter* (criatividade) e *Analista* (digestão de números grandes e métricas do Facebook).
+3. **NVIDIA NIM (`meta/llama-3.3-70b-instruct`)** ou **OpenRouter (Free Models)**:
+   - **Por que usar:** Atuam como os zagueiros substitutos. Se a Groq e o Google esgotarem as cotas diárias/minuto, o tráfego passa em fração de segundos pela linha defensiva gratuita alternativa.
+
+---
+
 ## 🧠 Arquitetura: Os 5 Especialistas
 
 O motor pulsa através de 5 agentes IA de papéis estritos. Eles não conversam sobre trivialidades; eles constroem campanhas.
