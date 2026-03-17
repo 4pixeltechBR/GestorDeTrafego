@@ -9,9 +9,10 @@
   [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-009688.svg)](https://fastapi.tiangolo.com)
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
   [![Meta Ads API](https://img.shields.io/badge/Meta_Ads_API-v25.0-0668E1.svg)](https://developers.facebook.com/docs/marketing-apis/)
+  [![Google Ads API](https://img.shields.io/badge/Google_Ads_API-v18.0-EA4335.svg)](https://developers.google.com/google-ads/api/docs/start)
   
   <p align="center">
-    Uma arquitetura multi-agente que interpreta briefings casuais, cria copys persuasivas validadas contra as políticas do Facebook, e sobe campanhas no Meta Ads automaticamente—tudo rodando no conforto (e segurança) da sua própria máquina.
+    Uma arquitetura multi-agente <strong>Omnichannel (Meta + Google)</strong> que interpreta briefings casuais, cria copys persuasivas ou anúncios de pesquisa (RSA), valida contra as políticas, e sobe campanhas automaticamente—tudo rodando no conforto da sua própria máquina.
   </p>
 </div>
 
@@ -54,14 +55,15 @@ Para manter o ecossistema Custo-Zero e ao mesmo tempo ter raciocínio nível Sê
 
 ---
 
-## 🧠 Arquitetura: Os 5 Especialistas
+## 🧠 Arquitetura: Os 6 Especialistas
 
-O motor pulsa através de 5 agentes IA de papéis estritos. Eles não conversam sobre trivialidades; eles constroem campanhas.
+O motor pulsa através de 6 agentes IA de papéis estritos. Eles não conversam sobre trivialidades; eles constroem campanhas omnichannel.
 
-- 🧠 **Orquestrador:** Interpreta seu desejo ("Quero vender pneu aro 15 na Zona Sul de SP") e estrutura as variáveis (público, idade, geolocalização, nicho).
-- ✍️ **Copywriter:** Munido de templates YAML específicos para cada nicho, gera 3 opções de textos persuasivos focados em conversão direta.
-- ⚖️ **Compliance:** Varre os textos gerados em busca de palavras proibidas pelo algoritmo do Facebook (ex: "renda extra", "emagreça 10kg"). Ele barra multas e bloqueios de BM antes mesmo da API da Meta sonhar com a campanha.
-- 📐 **Executor:** Envelopa os dados validados em JSONs blindados para a Meta Graph API v25.0, criando a Campanha (Sempre em modo Pausada, para sua revisão) -> AdSet -> AdCreative -> Anúncio.
+- 🧠 **Orquestrador:** Interpreta seu desejo ("Quero vender pneu aro 15 na Zona Sul de SP"), estrutura as variáveis (público, idade) e decide o melhor canal: Meta (Visual) ou Google (Intenção/Urgência).
+- ✍️ **Copywriter:** No Meta, gera 3 opções de textos persuasivos focados em conversão. No Google, gera Headlines e Descriptions milimetricamente calculadas para o formato RSA (Responsive Search Ads).
+- 🔍 **Keyword Planner (Novo):** O farejador do Google Search. Extrai palavras-chave exatas, de frase e amplas, além de blindar a campanha listando palavras negativas (Ex: "grátis", "como fazer").
+- ⚖️ **Compliance:** Varre os textos gerados em busca de palavras proibidas pelo algoritmo do Facebook e Google. Ele barra multas e bloqueios antes mesmo da API sonhar com a campanha.
+- 📐 **Executor:** Envelopa os dados validados e bifurca o sistema construindo o pacote JSON Graph API ou os frames gRPC mutáveis do Google Ads. (Sempre em modo Pausada, para sua revisão).
 - 📊 **Analista (O Motor Noturno):** Todos os dias, às 08:00 AM, ele acorda sozinho, caça os resultados diários, calcula o ROAS / CPA e te envia um relatório gerencial direto no Telegram. *(Modo Copilot)*.
 
 ---
