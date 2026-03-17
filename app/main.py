@@ -13,6 +13,7 @@ from config.settings import settings, BASE_DIR
 from app.core.database import init_db
 from app.scheduler.tasks import init_scheduler
 from app.notifications.telegram_bot import notifier
+from app.api.routes import router as api_router
 
 # Configura logging
 logging.basicConfig(
@@ -60,6 +61,9 @@ app = FastAPI(
     version="0.1.0",
     lifespan=lifespan,
 )
+
+# Adiciona Rotas da API
+app.include_router(api_router, prefix="/api")
 
 # Servir arquivos estáticos (Dashboard)
 ui_path = BASE_DIR / "ui"

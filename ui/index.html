@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Tráfego IA</title>
+    <!-- Fontes do Google (Modernas e Limpas) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Ícones -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Estilo Principal -->
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="dark-theme">
+    
+    <!-- Background Animado (Glows e Gradients) -->
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+    
+    <div class="app-container">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar glass-panel">
+            <div class="brand">
+                <div class="brand-icon">
+                    <i class="ri-robot-2-fill"></i>
+                </div>
+                <h2>Piloto<span class="text-gradient">Ads</span></h2>
+            </div>
+            
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" data-view="dashboard">
+                    <i class="ri-dashboard-line"></i> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-view="nova-campanha">
+                    <i class="ri-add-circle-line"></i> Nova Campanha
+                </a>
+                <a href="#" class="nav-item" data-view="historico">
+                    <i class="ri-history-line"></i> Histórico & Logs
+                </a>
+                <a href="#" class="nav-item" data-view="configuracoes">
+                    <i class="ri-settings-3-line"></i> Integrações
+                </a>
+            </nav>
+            
+            <div class="system-status">
+                <div class="status-indicator">
+                    <div class="pulse-dot"></div>
+                    <span>Sistema Operacional</span>
+                </div>
+                <div class="status-detail" id="llm-status">
+                    <i class="ri-brain-line"></i> IA: Pronta
+                </div>
+                <div class="status-detail" id="meta-status">
+                    <i class="ri-facebook-circle-line"></i> Meta API: Aguardando...
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Topbar (User Profile, Notifications) -->
+            <header class="topbar">
+                <div class="page-title">
+                    <h1 id="current-page-title">Dashboard Visionário</h1>
+                    <p id="current-page-subtitle">Visão geral do tráfego orientado por IA</p>
+                </div>
+                
+                <div class="user-controls">
+                    <button class="icon-btn" title="Notificações"><i class="ri-notification-3-line"></i></button>
+                    <div class="profile-chip glass-button">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=10b981&color=fff" alt="User">
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Vistas (Dashboard, Nova Campanha, etc) -->
+            <div class="view-container">
+                
+                <!-- View: Dashboard Principal -->
+                <section id="view-dashboard" class="view active fade-in">
+                    
+                    <!-- KPI Cards -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card glass-panel hover-lift">
+                            <div class="kpi-icon"><i class="ri-money-dollar-circle-line"></i></div>
+                            <div class="kpi-content">
+                                <p>Gasto Hoje (BRL)</p>
+                                <h3 id="kpi-spend">R$ 0,00</h3>
+                                <span class="badge success"><i class="ri-arrow-down-line"></i> Budget Seguro</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel hover-lift">
+                            <div class="kpi-icon"><i class="ri-line-chart-line"></i></div>
+                            <div class="kpi-content">
+                                <p>ROAS Médio</p>
+                                <h3 id="kpi-roas">0.0x</h3>
+                                <span class="badge warning"><i class="ri-loader-4-line"></i> Coletando dados</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel hover-lift">
+                            <div class="kpi-icon"><i class="ri-cursor-click-line"></i></div>
+                            <div class="kpi-content">
+                                <p>Cliques Gerados</p>
+                                <h3 id="kpi-clicks">0</h3>
+                                <span class="badge neutral"><i class="ri-bar-chart-2-line"></i> Últimas 24h</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card glass-panel hover-lift">
+                            <div class="kpi-icon"><i class="ri-advertisement-line"></i></div>
+                            <div class="kpi-content">
+                                <p>Campanhas Ativas</p>
+                                <h3 id="kpi-active">0</h3>
+                                <span class="badge neutral"><i class="ri-checkbox-circle-line"></i> Monitoradas</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Campanhas Recentes -->
+                    <div class="datatable-container glass-panel mt-6">
+                        <div class="datatable-header">
+                            <h3>Radar de Campanhas</h3>
+                            <button class="btn btn-primary btn-sm" onclick="switchView('nova-campanha')">
+                                <i class="ri-add-line"></i> Criar com IA
+                            </button>
+                        </div>
+                        <table class="modern-table">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Nome da Campanha</th>
+                                    <th>Nicho</th>
+                                    <th>Orçamento/Dia</th>
+                                    <th>Criada em</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="campaigns-table-body">
+                                <!-- Preenchido via JS -->
+                                <tr>
+                                    <td colspan="6" class="text-center empty-state">
+                                        <i class="ri-folder-open-line"></i>
+                                        <p>Nenhuma campanha criada ainda. Deixe a IA montar a primeira!</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- View: Nova Campanha (Wizard IA) -->
+                <section id="view-nova-campanha" class="view fade-in">
+                    <div class="wizard-container glass-panel">
+                        <h2>🤖 Briefing para IA Orquestradora</h2>
+                        <p class="subtitle">Escreva com suas palavras. O Orquestrador se vira com o resto.</p>
+
+                        <div class="wizard-step">
+                            <div class="form-group">
+                                <label for="briefing-input">Descreva o que deseja vender ou anunciar:</label>
+                                <textarea id="briefing-input" class="modern-input" rows="4" placeholder="Ex: Preciso de uma campanha para trocar pneus aro 15. Meu auto center fica em São Paulo. Orçamento de R$ 50/dia. Quero atrair motoristas..."></textarea>
+                            </div>
+                            
+                            <div class="form-actions mt-6">
+                                <button class="btn btn-primary" id="btn-gerar-campanha">
+                                    <i class="ri-magic-line"></i> Analisar & Criar Estrutura
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Console Terminal Simulation -->
+                        <div class="terminal-container" id="generation-terminal" style="display: none;">
+                            <div class="terminal-header">
+                                <span class="dot red"></span>
+                                <span class="dot yellow"></span>
+                                <span class="dot green"></span>
+                                <span class="terminal-title">Console Neural — Observabilidade</span>
+                            </div>
+                            <div class="terminal-body" id="terminal-logs">
+                                <!-- Logs injecteds via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- View: Configuracoes -->
+                <section id="view-configuracoes" class="view fade-in">
+                    <div class="glass-panel text-center">
+                        <h2><i class="ri-server-line"></i> Variáveis de Ambiente</h2>
+                        <p class="mt-4" style="color: var(--text-secondary);">
+                            Para a arquitetura local Open Source continuar 100% segura e livre de ataques mensais de SaaS, todo o roteamento foi protegido do seu navegador. 
+                            As chaves do provedor (Groq, NVIDIA, Gemini, Meta) residem na porta segura protegidas pelo <b>.env</b>.
+                        </p>
+                        <ul style="list-style: none; margin-top: 2rem; display: flex; flex-direction: column; gap: 1rem; text-align: left; max-width: 500px; margin-inline: auto;">
+                            <li class="status-detail"><i class="ri-check-line text-success"></i> Segurança de Backend (FastAPI Local) Ativada</li>
+                            <li class="status-detail"><i class="ri-check-line text-success"></i> Banco de SQLite Local Ativado</li>
+                            <li class="status-detail"><i class="ri-check-line text-warning"></i> Criptografia Ponta a Ponta Telegram Resguardada</li>
+                        </ul>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Script Principal -->
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
