@@ -42,6 +42,13 @@ async def setup_campaign(request: BriefingRequest, background_tasks: BackgroundT
         orch_res = await orchestrator.parse_briefing(request.briefing)
         orcamento = orch_res.get("orcamento_diario", 50.0)
 
+        # Normalização de Segurança. Às vezes o LLM alucina a string no lugar do dict
+        publico_alvo_raw = orch_res.get("publico_alvo", {})
+        if isinstance(publico_alvo_raw, str):
+            publico_alvo_raw = {"persona_inferida": publico_alvo_raw, "idade_min": 18, "idade_max": 65, "interesses": [], "localizacao": "Brasil"}
+        elif not isinstance(publico_alvo_raw, dict):
+            publico_alvo_raw = {}
+
         # 2. Guardrails Verificação Previa (Evita gastar token se já não pode processar o orçamento)
         try:
             await check_budget_guardrails(orcamento)
@@ -57,7 +64,7 @@ async def setup_campaign(request: BriefingRequest, background_tasks: BackgroundT
         copies = await copywriter.generate_copies(
             produto=orch_res.get("produto"),
             nicho=orch_res.get("nicho"),
-            publico_alvo=orch_res.get("publico_alvo"),
+            publico_alvo=publico_alvo_raw,
             objetivo=orch_res.get("objetivo"),
             canal=canal_decidido
         )
@@ -83,7 +90,7 @@ async def setup_campaign(request: BriefingRequest, background_tasks: BackgroundT
             keywords_payload = await kw_planner.generate_keywords(
                 produto=orch_res.get("produto"),
                 nicho=orch_res.get("nicho"),
-                publico_alvo=orch_res.get("publico_alvo"),
+                publico_alvo=publico_alvo_raw,
                 orcamento_diario=orcamento
             )
 
@@ -96,7 +103,7 @@ async def setup_campaign(request: BriefingRequest, background_tasks: BackgroundT
             nicho=orch_res.get("nicho"),
             copy=best_copy,
             orcamento_diario=orcamento,
-            publico_alvo=orch_res.get("publico_alvo"),
+            publico_alvo=publico_alvo_raw,
             objetivo=orch_res.get("objetivo"),
             canal=canal_decidido,
             keywords_payload=keywords_payload
