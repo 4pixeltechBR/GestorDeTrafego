@@ -33,6 +33,14 @@ class Settings(BaseSettings):
     meta_access_token: Optional[str] = Field(default=None)
     meta_ad_account_id: Optional[str] = Field(default=None)
 
+    # --- Google Ads ---
+    google_ads_developer_token: Optional[str] = Field(default=None)
+    google_ads_client_id: Optional[str] = Field(default=None)
+    google_ads_client_secret: Optional[str] = Field(default=None)
+    google_ads_refresh_token: Optional[str] = Field(default=None)
+    google_ads_customer_id: Optional[str] = Field(default=None)  # Sem hífens (ex: 1234567890)
+    google_ads_login_customer_id: Optional[str] = Field(default=None)
+
     # --- Telegram ---
     telegram_bot_token: Optional[str] = Field(default=None)
     telegram_admin_chat_id: Optional[str] = Field(default=None)
@@ -77,6 +85,17 @@ class Settings(BaseSettings):
         return all([
             self.telegram_bot_token,
             self.telegram_admin_chat_id,
+        ])
+
+    @property
+    def has_google_ads(self) -> bool:
+        """Verifica se Google Ads está configurado."""
+        return all([
+            self.google_ads_developer_token,
+            self.google_ads_client_id,
+            self.google_ads_client_secret,
+            self.google_ads_refresh_token,
+            self.google_ads_customer_id,
         ])
 
 

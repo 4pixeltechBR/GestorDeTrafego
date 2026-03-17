@@ -39,6 +39,7 @@ async def init_db() -> None:
                 product TEXT,
                 daily_budget REAL,
                 status TEXT DEFAULT 'DRAFT',
+                platform TEXT DEFAULT 'meta',
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 copy_title TEXT,

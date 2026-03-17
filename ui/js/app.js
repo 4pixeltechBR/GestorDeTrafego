@@ -84,6 +84,27 @@ const briefingInput = document.getElementById("briefing-input");
 const terminal = document.getElementById("generation-terminal");
 const terminalLogs = document.getElementById("terminal-logs");
 
+// UI Toggle de Canal
+function setCanal(canal) {
+    document.getElementById('canal-selecionado').value = canal;
+    const btns = [document.getElementById('canal-auto'), document.getElementById('canal-meta'), document.getElementById('canal-google')];
+    btns.forEach(b => {
+        b.classList.remove('btn-primary');
+        b.style.background = 'var(--bg-surface)';
+    });
+    
+    if(canal === 'auto') {
+        btns[0].classList.add('btn-primary');
+        btns[0].style.background = '';
+    } else if (canal === 'meta') {
+        btns[1].classList.add('btn-primary');
+        btns[1].style.background = '';
+    } else {
+        btns[2].classList.add('btn-primary');
+        btns[2].style.background = '';
+    }
+}
+
 function addTerminalLog(agent, msg, type="normal") {
     let cssClass = "log-line";
     if (type === "success") cssClass += " log-success";
@@ -123,10 +144,11 @@ btnGerar.addEventListener("click", async () => {
     addTerminalLog("Orquestrador", "Processando raw text recebido do Dashboard...");
     
     try {
+        const canalChoosed = document.getElementById('canal-selecionado').value;
         const response = await fetch('/api/campaigns/setup', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ briefing: text })
+            body: JSON.stringify({ briefing: text, canal: canalChoosed })
         });
         
         const result = await response.json();

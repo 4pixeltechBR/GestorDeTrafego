@@ -156,11 +156,19 @@
                 <section id="view-nova-campanha" class="view fade-in">
                     <div class="wizard-container glass-panel">
                         <h2>🤖 Briefing para IA Orquestradora</h2>
-                        <p class="subtitle">Escreva com suas palavras. O Orquestrador se vira com o resto.</p>
+						<p class="subtitle">Escreva com suas palavras. O Orquestrador se vira com o resto.</p>
 
-                        <div class="wizard-step">
-                            <div class="form-group">
-                                <label for="briefing-input">Descreva o que deseja vender ou anunciar:</label>
+						<div class="platform-selector mt-6 mb-4" style="display: flex; gap: 10px;">
+							<button class="btn btn-sm btn-primary" id="canal-auto" onclick="setCanal('auto')">🤖 Auto (IA Decide)</button>
+							<button class="btn btn-sm" style="background: var(--bg-surface); color: var(--text-primary);" id="canal-meta" onclick="setCanal('meta')">📱 Meta Ads</button>
+							<button class="btn btn-sm" style="background: var(--bg-surface); color: var(--text-primary);" id="canal-google" onclick="setCanal('google_search')">🔍 Google Search</button>
+						</div>
+
+						<input type="hidden" id="canal-selecionado" value="auto">
+
+						<div class="wizard-step">
+							<div class="form-group">
+								<label for="briefing-input">Descreva o que deseja vender ou anunciar:</label>
                                 <textarea id="briefing-input" class="modern-input" rows="4" placeholder="Ex: Preciso de uma campanha para trocar pneus aro 15. Meu auto center fica em São Paulo. Orçamento de R$ 50/dia. Quero atrair motoristas..."></textarea>
                             </div>
                             

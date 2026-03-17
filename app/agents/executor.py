@@ -45,6 +45,8 @@ class ExecutorAgent(BaseAgent):
         nome_campanha: Optional[str] = None,
         link_destino: str = "https://exemplo.com.br",
         campaign_id: Optional[str] = None,
+        canal: str = "meta",
+        keywords_payload: Optional[dict] = None
     ) -> dict:
         """
         Monta os 3 JSONs da Meta API (Campaign, Ad Set, Ad).
@@ -87,15 +89,27 @@ PÚBLICO-ALVO:
 - Localização: {publico_alvo.get('localizacao', 'Brasil')}
 """
 
-        result = await self.think(
-            user_message=(
+        if canal == "google_search":
+            user_message = (
+                "Monte o payload JSON para o motor gRPC do Google Ads.\n"
+                "Deve conter os nós: 'budget', 'campaign', 'ad_group', 'keywords' (array de strings extraídos do keywords_payload que recebi no dict keywords), e 'ad'.\n"
+                "O 'ad' deve conter 'headlines', 'descriptions' e 'final_urls'.\n"
+                "Para 'campaign', o status deve ser 'PAUSED'."
+            )
+            # Injeta as KWs no context
+            context += f"\nKEYWORDS: {json.dumps(keywords_payload) if keywords_payload else '[]'}"
+        else:
+            user_message = (
                 "Monte os 3 JSONs para a Meta Marketing API v25.0:\n"
                 "1. Campaign\n2. Ad Set\n3. Ad\n\n"
                 "REGRAS CRÍTICAS:\n"
                 "- Status sempre 'PAUSED' (nunca ACTIVE)\n"
                 "- Budget em CENTAVOS\n"
                 "- Retorne apenas JSON válido"
-            ),
+            )
+
+        result = await self.think(
+            user_message=user_message,
             context=context,
             temperature=0.1,  # Mínimo — zero criatividade, máxima precisão
             response_format={"type": "json_object"},

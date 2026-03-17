@@ -11,6 +11,7 @@ from app.agents.orchestrator import OrchestratorAgent
 from app.agents.copywriter import CopywriterAgent
 from app.agents.compliance import ComplianceAgent
 from app.agents.executor import ExecutorAgent
+from app.agents.keyword_planner import KeywordPlannerAgent
 from app.meta.manager import publish_campaign_structure
 from app.guardrails.budget import check_budget_guardrails, BudgetExceededError
 
@@ -20,6 +21,7 @@ router = APIRouter()
 
 class BriefingRequest(BaseModel):
     briefing: str
+    canal: str = "auto"  # "auto", "meta", "google_search"
 
 @router.post("/campaigns/setup")
 async def setup_campaign(request: BriefingRequest, background_tasks: BackgroundTasks):
@@ -46,13 +48,18 @@ async def setup_campaign(request: BriefingRequest, background_tasks: BackgroundT
         except BudgetExceededError as e:
             raise HTTPException(status_code=403, detail=str(e))
 
-        # 3. Copywriter
+        canal_decidido = orch_res.get("canal", "meta")
+        if request.canal != "auto":
+            canal_decidido = request.canal
+
+        # 3. Copywriter (Agora entende RSA se for Google)
         copywriter = CopywriterAgent()
         copies = await copywriter.generate_copies(
             produto=orch_res.get("produto"),
             nicho=orch_res.get("nicho"),
             publico_alvo=orch_res.get("publico_alvo"),
-            objetivo=orch_res.get("objetivo")
+            objetivo=orch_res.get("objetivo"),
+            canal=canal_decidido
         )
 
         if not copies or not copies.get("opcoes"):
@@ -66,19 +73,33 @@ async def setup_campaign(request: BriefingRequest, background_tasks: BackgroundT
             detalhes = [p.get("trecho") for p in comp_res.get("problemas", [])]
             raise HTTPException(
                 status_code=406, 
-                detail=f"Bloqueado pelo Compliance (Risco Meta Ads). Problemas: {detalhes}"
+                detail=f"Bloqueado pelo Compliance (Risco). Problemas: {detalhes}"
             )
 
-        # 5. Executor (Monta o JSON da Meta API)
+        # 4.5. Keyword Planner (SÓ SE FOR GOOGLE_SEARCH)
+        keywords_payload = None
+        if canal_decidido == "google_search":
+            kw_planner = KeywordPlannerAgent()
+            keywords_payload = await kw_planner.generate_keywords(
+                produto=orch_res.get("produto"),
+                nicho=orch_res.get("nicho"),
+                publico_alvo=orch_res.get("publico_alvo"),
+                orcamento_diario=orcamento
+            )
+
+        # 5. Executor (Monta o JSON dependendo do canal)
         executor = ExecutorAgent()
         best_copy = copies["opcoes"][0] # Na Fase 5 pegamos a primeira APROVADA
+        
         meta_payload = await executor.build_campaign_json(
             produto=orch_res.get("produto"),
             nicho=orch_res.get("nicho"),
             copy=best_copy,
             orcamento_diario=orcamento,
             publico_alvo=orch_res.get("publico_alvo"),
-            objetivo=orch_res.get("objetivo")
+            objetivo=orch_res.get("objetivo"),
+            canal=canal_decidido,
+            keywords_payload=keywords_payload
         )
 
         if "erro" in meta_payload:

@@ -104,11 +104,14 @@ class OrchestratorAgent(BaseAgent):
             return {
                 "produto": briefing[:100],
                 "nicho": detected_niche,
+                "canal": "meta", # fallback safe
                 "objetivo": "OUTCOME_TRAFFIC",
                 "orcamento_diario": 30.0,
                 "publico_alvo": {
+                    "persona_inferida": "Massa Geral de Teste",
                     "idade_min": 25,
                     "idade_max": 55,
+                    "renda_estimada": "Qualquer",
                     "interesses": [],
                     "localizacao": "Brasil",
                 },

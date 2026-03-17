@@ -42,6 +42,7 @@ class CopywriterAgent(BaseAgent):
         nicho: str,
         publico_alvo: dict,
         objetivo: str = "OUTCOME_TRAFFIC",
+        canal: str = "meta",
         contexto_extra: Optional[str] = None,
         campaign_id: Optional[str] = None,
     ) -> dict:
@@ -88,14 +89,25 @@ class CopywriterAgent(BaseAgent):
 
         context = "\n".join(context_parts) if context_parts else None
 
-        result = await self.think(
-            user_message=(
+        if canal == "google_search":
+            user_message = (
+                f"Crie um anúncio RSA (Google Search) para:\n\n"
+                f"PRODUTO/SERVIÇO: {produto}\n\n"
+                f"Você DEVE gerar 5 Headlines (máximo ABSOLUTO de 30 caracteres cada) e "
+                f"3 Descriptions (máximo ABSOLUTO de 90 caracteres cada). "
+                f"Retorne o JSON no formato: {{'opcoes': [{{'headlines': [...], 'descriptions': [...]}}]}}"
+            )
+        else:
+            user_message = (
                 f"Crie 2-3 opções de copy para este anúncio no Meta Ads:\n\n"
                 f"PRODUTO/SERVIÇO: {produto}\n"
                 f"OBJETIVO DA CAMPANHA: {objetivo}\n\n"
-                f"Gere copies prontas para teste A/B. Inclua título, "
-                f"texto principal, descrição e CTA para cada opção."
-            ),
+                f"Gere copies prontas para teste A/B. Inclua titulo, "
+                f"texto_principal, descricao e cta para cada opção."
+            )
+
+        result = await self.think(
+            user_message=user_message,
             context=context,
             temperature=0.8,  # Alto — queremos criatividade
             response_format={"type": "json_object"},
