@@ -120,9 +120,27 @@ class CopywriterAgent(BaseAgent):
             if "opcoes" not in copies:
                 # Tenta normalizar se o LLM usou estrutura diferente
                 if isinstance(copies, list):
-                    copies = {"opcoes": copies}
+                    normalized = []
+                    for c in copies:
+                        if isinstance(c, str):
+                            normalized.append({"texto_principal": c})
+                        elif isinstance(c, dict):
+                            normalized.append(c)
+                    copies = {"opcoes": normalized if normalized else [{"texto_principal": "Texto de campanha genérica"}]}
                 else:
-                    copies = {"opcoes": [copies]}
+                    if isinstance(copies, str):
+                        copies = {"opcoes": [{"texto_principal": copies}]}
+                    else:
+                        copies = {"opcoes": [copies]}
+            else:
+                # Assegura que todos iteradores dentro de opções são dicionários
+                normalized = []
+                for c in copies["opcoes"]:
+                     if isinstance(c, str):
+                         normalized.append({"texto_principal": c})
+                     elif isinstance(c, dict):
+                         normalized.append(c)
+                copies["opcoes"] = normalized if normalized else [{"texto_principal": "Texto de campanha genérica"}]
 
             copies["_meta"] = {
                 "llm_provider": result["provider"],
