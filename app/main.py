@@ -11,6 +11,8 @@ from fastapi.responses import FileResponse
 
 from config.settings import settings, BASE_DIR
 from app.core.database import init_db
+from app.scheduler.tasks import init_scheduler
+from app.notifications.telegram_bot import notifier
 
 # Configura logging
 logging.basicConfig(
@@ -37,13 +39,18 @@ async def lifespan(app: FastAPI):
     # Inicializa banco de dados
     await init_db()
 
-    # TODO: Fase 4 — Inicializar Scheduler (análise diária)
-    # TODO: Fase 4 — Inicializar Bot Telegram
+    # Fase 4 — Inicializar Bot Telegram
+    await notifier.ping()
+
+    # Fase 4 — Inicializar Scheduler (análise diária às 08:00)
+    scheduler = init_scheduler()
+    scheduler.start()
 
     yield
 
     # --- SHUTDOWN ---
     logger.info(f"🛑 {settings.app_name} finalizando...")
+    scheduler.shutdown()
 
 
 # Cria app FastAPI
