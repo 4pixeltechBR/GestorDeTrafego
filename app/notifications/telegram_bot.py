@@ -106,7 +106,7 @@ class NotificationSystem:
     async def send_daily_report(self, report_text: str):
         """Envia o relatório de análise matinal."""
         message = (
-            f"*\ud83d\udcca Relat\u00f3rio Di\u00e1rio de Tr\u00e1fego*\n"
+            f"<b>\ud83d\udcca Relat\u00f3rio Di\u00e1rio de Tr\u00e1fego</b>\n"
             f"━━━━━━━━━━━━━━━━━━━\n"
             f"{report_text}"
         )

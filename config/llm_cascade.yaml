@@ -56,3 +56,17 @@ analyst:
     - provider: groq
       model: "groq/llama-3.3-70b-versatile"
       max_tokens: 4096
+
+keyword_planner:
+  name: "Keyword Planner"
+  description: "Gera palavras-chave de alta intenção para Google Search."
+  models:
+    - provider: groq
+      model: "groq/llama-3.3-70b-versatile"
+      max_tokens: 2048
+    - provider: google
+      model: "gemini/gemini-2.0-flash"
+      max_tokens: 2048
+    - provider: openrouter
+      model: "openrouter/meta-llama/llama-3.3-70b-instruct:free"
+      max_tokens: 2048

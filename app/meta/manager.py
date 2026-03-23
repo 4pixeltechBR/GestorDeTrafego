@@ -10,6 +10,7 @@ from typing import Dict, Any, Tuple
 
 from app.meta.client import MetaAsyncClient, MetaAPIError
 from config.meta_api import ENDPOINTS
+from config.settings import settings
 
 logger = logging.getLogger(__name__)
 
@@ -84,7 +85,7 @@ async def publish_campaign_structure(
         adcreative_payload = {
             "name": f"Creative - {ad_payload.get('name', 'Ad')}",
             "object_story_spec": {
-                "page_id": "<PAGE_ID_AQUI>", # Todo: Configuração de Página FB do usuário
+                "page_id": settings.meta_page_id,
                 "link_data": {
                     "link": creative_data.get("link_url", "https://exemplo.com"),
                     "message": creative_data.get("body", ""),

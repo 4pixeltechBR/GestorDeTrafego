@@ -1,0 +1,48 @@
+nicho: restaurante
+nome_display: "Restaurante / Delivery"
+
+publico_alvo:
+  idade_min: 18
+  idade_max: 50
+  interesses:
+    - "Gastronomia"
+    - "Delivery"
+    - "Restaurantes"
+    - "Comida"
+    - "iFood"
+  localizacao: "raio_km: 5"
+  genero: "todos"
+
+benchmarks:
+  cpc_medio: 0.90
+  ctr_medio: 2.0
+  cpc_maximo_aceitavel: 2.00
+  roas_minimo: 3.0
+  dias_aprendizado: 3
+  frequencia_maxima: 4.0
+
+copy_diretrizes:
+  tom: "apetitoso, casual, urgente"
+  gatilhos:
+    - "peça agora"
+    - "entrega rápida"
+    - "frete grátis"
+    - "promoção de hoje"
+    - "sabor de verdade"
+  proibido:
+    - "o melhor da cidade"
+    - "preços que você não vai acreditar"
+    - "afirmações nutricionais sem base"
+  exemplos_titulo:
+    - "Peça Agora — Entrega em 30min"
+    - "Promoção de Hoje — Só até às 22h"
+    - "Frete Grátis no Primeiro Pedido"
+
+metricas_prioridade:
+  - "ROAS"
+  - "CTR"
+  - "CPC"
+  - "CPA"
+
+objetivo_padrao: "OUTCOME_SALES"
+cta_padrao: "ORDER_NOW"

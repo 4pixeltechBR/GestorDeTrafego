@@ -3,56 +3,55 @@ title Gestor de Trafego IA
 color 0A
 echo.
 echo  ============================================
-echo   🚀 GESTOR DE TRÁFEGO IA
-echo   Copiloto de Tráfego Pago com IA
+echo   GESTOR DE TRAFEGO IA — Telegram Bot
 echo  ============================================
 echo.
 
-:: Verifica se Python está instalado
+:: Verifica Python
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
-    echo  ❌ Python não encontrado!
+    echo  ERRO: Python nao encontrado!
     echo  Instale em: https://www.python.org/downloads/
     pause
     exit /b
 )
 
-:: Verifica se venv existe, senão cria
+:: Cria venv se nao existir
 if not exist "venv" (
-    echo  📦 Criando ambiente virtual...
+    echo  Criando ambiente virtual...
     python -m venv venv
-    echo  ✅ Ambiente virtual criado!
+    echo  Ambiente virtual criado!
     echo.
 )
 
-:: Ativa o venv
+:: Ativa venv
 call venv\Scripts\activate.bat
 
-:: Verifica se dependências estão instaladas
-if not exist "venv\Lib\site-packages\fastapi" (
-    echo  📦 Instalando dependências...
+:: Instala dependencias se necessario
+if not exist "venv\Lib\site-packages\telegram" (
+    echo  Instalando dependencias...
     pip install -r requirements.txt --quiet
-    echo  ✅ Dependências instaladas!
+    echo  Dependencias instaladas!
     echo.
 )
 
-:: Verifica se .env existe
+:: Verifica .env
 if not exist ".env" (
-    echo  ⚠️  Arquivo .env não encontrado!
-    echo  Copiando .env.example para .env...
+    echo  Arquivo .env nao encontrado!
+    echo  Criando a partir do .env.example...
     copy .env.example .env
     echo.
-    echo  📝 IMPORTANTE: Edite o arquivo .env com suas API Keys!
+    echo  IMPORTANTE: Edite o .env com suas chaves antes de continuar!
     echo  Abra com: notepad .env
     echo.
     pause
+    exit /b
 )
 
-:: Inicia o servidor
-echo  🚀 Iniciando servidor em http://localhost:8080
-echo  📖 Documentação da API: http://localhost:8080/docs
+:: Inicia o bot
+echo  Iniciando GestorDeTrafego via Telegram...
 echo  Pressione Ctrl+C para parar.
 echo.
-python -m uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
+python bot.py
 
 pause

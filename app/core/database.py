@@ -9,6 +9,8 @@ Gerencia conexões e criação de tabelas para:
 
 import logging
 import aiosqlite
+import json
+import uuid
 from pathlib import Path
 
 from config.settings import BASE_DIR
@@ -104,5 +106,83 @@ async def get_db() -> aiosqlite.Connection:
     DB_DIR.mkdir(parents=True, exist_ok=True)
     db = await aiosqlite.connect(str(DB_PATH))
     db.row_factory = aiosqlite.Row
-    await db.execute("PRAGMA journal_mode=WAL")
     return db
+
+
+async def save_pending_campaign(pipeline_result: dict) -> str:
+    """
+    Salva resultado do pipeline como campanha PENDENTE (aguardando aprovação).
+
+    Returns:
+        pending_id: ID interno gerado para esta campanha pendente.
+    """
+    pending_id = str(uuid.uuid4())[:12]
+
+    db = await get_db()
+    await db.execute(
+        """
+        INSERT INTO campaigns
+            (id, name, niche, product, daily_budget, status,
+             platform, copy_title, copy_body, targeting_json, meta_response_json)
+        VALUES (?, ?, ?, ?, ?, 'PENDING', ?, ?, ?, ?, ?)
+        """,
+        (
+            pending_id,
+            pipeline_result.get("produto", "Campanha IA")[:100],
+            pipeline_result.get("nicho", "servicos"),
+            pipeline_result.get("produto", ""),
+            pipeline_result.get("orcamento", 0),
+            pipeline_result.get("canal", "meta"),
+            pipeline_result["copies"][0].get("titulo", "") if pipeline_result.get("copies") else "",
+            pipeline_result["copies"][0].get("texto_principal", "") if pipeline_result.get("copies") else "",
+            json.dumps(
+                pipeline_result.get("orchestration", {}).get("publico_alvo", {}),
+                ensure_ascii=False
+            ),
+            json.dumps(pipeline_result, ensure_ascii=False),
+        ),
+    )
+    await db.commit()
+    await db.close()
+
+    logger.info(f"[DB] Campanha pendente salva: {pending_id}")
+    return pending_id
+
+
+async def get_pending_campaign(pending_id: str) -> dict | None:
+    """Busca uma campanha pendente pelo ID interno."""
+    db = await get_db()
+    cursor = await db.execute(
+        "SELECT * FROM campaigns WHERE id = ? AND status = 'PENDING'",
+        (pending_id,),
+    )
+    row = await cursor.fetchone()
+    await db.close()
+
+    if not row:
+        return None
+
+    result = dict(row)
+    if result.get("meta_response_json"):
+        try:
+            result["pipeline_result"] = json.loads(result["meta_response_json"])
+        except Exception:
+            pass
+    return result
+
+
+async def update_campaign_status(campaign_id: str, status: str, meta_id: str = None) -> None:
+    """Atualiza o status de uma campanha no banco local."""
+    db = await get_db()
+    if meta_id:
+        await db.execute(
+            "UPDATE campaigns SET status = ?, meta_campaign_id = ? WHERE id = ?",
+            (status, meta_id, campaign_id),
+        )
+    else:
+        await db.execute(
+            "UPDATE campaigns SET status = ? WHERE id = ?",
+            (status, campaign_id),
+        )
+    await db.commit()
+    await db.close()

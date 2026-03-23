@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     meta_app_secret: Optional[str] = Field(default=None)
     meta_access_token: Optional[str] = Field(default=None)
     meta_ad_account_id: Optional[str] = Field(default=None)
+    meta_page_id: Optional[str] = Field(default=None)  # NOVO — ID da página do Facebook
 
     # --- Google Ads ---
     google_ads_developer_token: Optional[str] = Field(default=None)
@@ -77,6 +78,7 @@ class Settings(BaseSettings):
             self.meta_app_id,
             self.meta_access_token,
             self.meta_ad_account_id,
+            self.meta_page_id,
         ])
 
     @property

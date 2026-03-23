@@ -1,0 +1,49 @@
+nicho: clinica
+nome_display: "Clínica / Consultório"
+
+publico_alvo:
+  idade_min: 25
+  idade_max: 60
+  interesses:
+    - "Saúde e bem-estar"
+    - "Medicina"
+    - "Cuidados pessoais"
+    - "Plano de saúde"
+    - "Consulta médica"
+  localizacao: "raio_km: 10"
+  genero: "todos"
+
+benchmarks:
+  cpc_medio: 2.50
+  ctr_medio: 1.5
+  cpc_maximo_aceitavel: 5.00
+  roas_minimo: 2.0
+  dias_aprendizado: 3
+  frequencia_maxima: 3.0
+
+copy_diretrizes:
+  tom: "acolhedor, profissional, empático"
+  gatilhos:
+    - "sua saúde em primeiro lugar"
+    - "agendamento fácil"
+    - "profissionais especializados"
+    - "atendimento humanizado"
+    - "primeira consulta"
+  proibido:
+    - "cura garantida"
+    - "resultados em X dias"
+    - "comparação com outros profissionais"
+    - "antes e depois"
+  exemplos_titulo:
+    - "Cuide da sua saúde — Agende Agora"
+    - "Consulta com Especialista — Hoje"
+    - "Sua saúde merece atenção"
+
+metricas_prioridade:
+  - "CPA"
+  - "CTR"
+  - "ROAS"
+  - "CPC"
+
+objetivo_padrao: "OUTCOME_LEADS"
+cta_padrao: "BOOK_NOW"

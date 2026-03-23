@@ -1,10 +1,7 @@
 """
-Módulo do Agendador (Scheduler).
+Scheduler — Tarefas em segundo plano.
 
-Configura tarefas em segundo plano (APScheduler) para o loop principal:
-1. Buscar dados de insights de todas as campanhas ativas.
-2. Analisar as métricas com o Agente Analista.
-3. Enviar relatório consolidado pelo Telegram.
+Job diário às 08:00: busca métricas, analisa, envia relatório no Telegram.
 """
 
 import logging
@@ -14,85 +11,95 @@ from apscheduler.triggers.cron import CronTrigger
 from app.core.database import get_db
 from app.meta.insights import fetch_campaign_metrics
 from app.agents.analyst import AnalystAgent
-from app.notifications.telegram_bot import notifier
+from app.bot.formatter import format_daily_report
 
 logger = logging.getLogger(__name__)
+
+# Referência ao bot Telegram (injetada no init_scheduler)
+_bot = None
 
 
 async def daily_analysis_job():
     """
-    Job Diário de Análise.
-    - Puxa campanhas ativas no DB local.
-    - Busca insights na API do Meta.
-    - Analisa com LLM Analyst.
-    - Notifica no Telegram o diagnóstico final.
+    Job diário de análise.
+    Busca campanhas publicadas, analisa métricas, envia relatório.
     """
-    logger.info("[Scheduler] \u23f1\ufe0f Iniciando \u00e1nalise di\u00e1ria de campanhas ativas...")
-    
+    logger.info("[Scheduler] Iniciando análise diária...")
+
     try:
         db = await get_db()
-        cursor = await db.execute("SELECT * FROM campaigns WHERE status = 'ACTIVE'")
-        active_campaigns = await cursor.fetchall()
+        # CORRIGIDO: busca campanhas publicadas (meta_campaign_id preenchido)
+        # independente do status local, pois o usuário pode ter ativado no Meta
+        cursor = await db.execute(
+            "SELECT * FROM campaigns WHERE meta_campaign_id IS NOT NULL AND status != 'DELETED'"
+        )
+        campaigns = await cursor.fetchall()
         await db.close()
 
-        if not active_campaigns:
-            logger.info("[Scheduler] Nenhuma campanha ativa encontrada para an\u00e1lise.")
+        if not campaigns:
+            logger.info("[Scheduler] Nenhuma campanha publicada para analisar.")
             return
 
         analyst = AnalystAgent()
-        report_lines = []
+        report_lines = ["<b>📊 Relatório Diário de Tráfego</b>", "━━━━━━━━━━━━━━━━━━━", ""]
 
-        for campaign in active_campaigns:
+        for campaign in campaigns:
             meta_campaign_id = campaign["meta_campaign_id"]
             name = campaign["name"]
             niche = campaign["niche"] or "servicos"
-            
-            logger.info(f"[Scheduler] Analisando: '{name}' ({meta_campaign_id})")
-            
-            # Busca métricas
+
+            logger.info(f"[Scheduler] Analisando: '{name}'")
+
             metrics = await fetch_campaign_metrics(meta_campaign_id)
-            
-            # Avalia
-            analysis_result = await analyst.analyze(
+
+            analysis = await analyst.analyze(
                 metrics=metrics,
                 campaign_name=name,
                 niche=niche,
-                days_running=7 # Todo: Fórmular baseado no created_at
+                days_running=7,
             )
-            
-            diag = analysis_result.get("diagnostico", "UNKNOWN")
-            rec = analysis_result.get("recomendacao", {}).get("acao", "UNKNOWN")
-            smry = analysis_result.get("resumo", "Sem resumo.")
-            
-            # Adiciona ao relatório
-            report_lines.append(f"<b>\ud83d\udce3 {name}</b>")
-            report_lines.append(f"<b>Diagn\u00f3stico:</b> {diag} | <b>Recomenda\u00e7\u00e3o:</b> {rec}")
-            report_lines.append(f"<i>{smry}</i>")
-            report_lines.append("") # Quebra de linha
-            
-        # Consolida
-        final_report = "\n".join(report_lines)
-        
-        # Envia no Telegram
-        await notifier.send_daily_report(final_report)
-        logger.info("[Scheduler] \u2705 An\u00e1lise di\u00e1ria conclu\u00edda e enviada.")
-        
+
+            report_block = format_daily_report(name, metrics, analysis)
+            report_lines.append(report_block)
+            report_lines.append("")
+
+        full_report = "\n".join(report_lines)
+
+        # Envia via bot Telegram
+        if _bot:
+            from config.settings import settings
+            await _bot.send_message(
+                chat_id=settings.telegram_admin_chat_id,
+                text=full_report,
+                parse_mode="HTML",
+            )
+            logger.info("[Scheduler] Relatório enviado com sucesso.")
+        else:
+            logger.warning("[Scheduler] Bot não configurado. Relatório não enviado.")
+            logger.info(f"[Scheduler] Relatório:\n{full_report}")
+
     except Exception as e:
-        logger.error(f"[Scheduler] \u274c Erro no job di\u00e1rio de an\u00e1lise: {e}")
+        logger.error(f"[Scheduler] Erro no job diário: {e}", exc_info=True)
 
 
-def init_scheduler() -> AsyncIOScheduler:
-    """Inicializa as rotinas em background."""
+def init_scheduler(bot=None) -> AsyncIOScheduler:
+    """
+    Inicializa o scheduler.
+
+    Args:
+        bot: Instância do Bot Telegram para envio de relatórios.
+    """
+    global _bot
+    _bot = bot
+
     scheduler = AsyncIOScheduler()
-    
-    # 1. Job Diário: Executa todos os dias às 08:00 AM
     scheduler.add_job(
         daily_analysis_job,
         trigger=CronTrigger(hour=8, minute=0),
         id="daily_insight_analysis",
         replace_existing=True,
-        misfire_grace_time=3600 # Dá 1h de chance de rodar se o bot estava offline as 8:00
+        misfire_grace_time=3600,
     )
-    
-    logger.info("[Scheduler] Cron Jobs configurados (An\u00e1lise Di\u00e1ria s\u00e0s 08:00)")
+
+    logger.info("[Scheduler] Job diário configurado (08:00).")
     return scheduler
